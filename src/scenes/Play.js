@@ -8,6 +8,7 @@ class Play extends Phaser.Scene {
     this.load.image("spaceship", "./assets/spaceship.png");
     this.load.image("speedship", "./assets/speedship.png");
     this.load.image("starfield", "./assets/starfield.png");
+    this.load.image("greenpop", "./assets/greenpop.png");
     this.load.spritesheet("explosion", "./assets/explosion.png", {
       frameWidth: 64,
       frameHeight: 32,
@@ -16,6 +17,8 @@ class Play extends Phaser.Scene {
     });
   }
   create() {
+
+
     this.starfield = this.add
       .tileSprite(0, 0, 640, 480, "starfield")
       .setOrigin(0, 0);
@@ -127,9 +130,9 @@ class Play extends Phaser.Scene {
       this.p1Score,
       scoreConfig
     );
+
     // GAME OVER flag
     this.gameOver = false;
-
     // 60-second play clock
     scoreConfig.fixedWidth = 0;
     this.clock = this.time.delayedCall(
@@ -155,6 +158,13 @@ class Play extends Phaser.Scene {
       },
       null,
       this
+    );
+    
+    this.add.text(
+      borderUISize + borderPadding * 40,
+      borderUISize + borderPadding * 2,
+      "0:00",
+      scoreConfig
     );
   }
   update() {
@@ -205,16 +215,26 @@ class Play extends Phaser.Scene {
     // temporarily hide ship
     ship.alpha = 0;                         
     // create explosion sprite at ship's position
+    const p = this.add.particles("greenpop");
+    const e = p.createEmitter();
+    e.setPosition(ship.x+15,ship.y+15);
+    e.setSpeed(50);
+    e.setBlendMode(Phaser.BlendModes.ADD);
+    e.explode(25,ship.x+15,ship.y+15);
+
     let boom = this.add.sprite(ship.x, ship.y, 'explosion').setOrigin(0, 0);
     boom.anims.play('explode');             // play explode animation
     boom.on('animationcomplete', () => {    // callback after ani completes
       ship.reset();                       // reset ship position
       ship.alpha = 1;                     // make ship visible again
-      boom.destroy();                     // remove explosion sprite
+      boom.destroy();                    // remove explosion sprite
+
     });
+
     // score add and repaint
     this.p1Score += ship.points;
     this.scoreLeft.text = this.p1Score;
-    this.sound.play('sfx_explosion');     
+    this.sound.play('sfx_explosion');    
   }
+
 }

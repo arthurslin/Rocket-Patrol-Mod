@@ -34,6 +34,16 @@ class Menu extends Phaser.Scene {
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
     }
     update() {
+        // Skip Menu
+        game.settings = {
+          spaceshipSpeed: 3,
+          speedshipSpeed: 5,
+          gameTimer: 10000 
+        }
+        this.sound.play('sfx_select');
+        this.scene.start('playScene')
+        // Skip Menu end
+
         if (Phaser.Input.Keyboard.JustDown(keyLEFT)) {
           // easy mode
           game.settings = {
