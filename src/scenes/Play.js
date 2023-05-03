@@ -4,6 +4,7 @@ class Play extends Phaser.Scene {
   }
   preload() {
     // load images/tile sprites
+    this.load.audio("faded","./assets/alan-walker-faded.mp3");
     this.load.image("rocket", "./assets/rocket.png");
     this.load.image("spaceship", "./assets/spaceship.png");
     this.load.image("speedship", "./assets/speedship.png");
@@ -17,6 +18,10 @@ class Play extends Phaser.Scene {
     });
   }
   create() {
+    this.music = this.sound.add("faded");
+    this.music.setVolume(0.25);
+    this.music.play();
+
     this.starfield = this.add
       .tileSprite(0, 0, 640, 480, "starfield")
       .setOrigin(0, 0);
@@ -151,12 +156,19 @@ class Play extends Phaser.Scene {
     this.gameOver = false;
     this.gameTimer = game.settings.gameTimer
 
-
     scoreConfig.fixedWidth = 0;
     this.overtext = this.add.text(game.config.width/2, game.config.height/2, "", scoreConfig).setOrigin(0.5);
     this.restarttext = this.add.text(game.config.width/2, game.config.height/2 + 64, "", scoreConfig).setOrigin(0.5);
 
     this.gameCountdown = this.time.addEvent({ delay: 1000, callback: onEvent, callbackScope: this, loop: true}); // code from jjcapellan https://phaser.discourse.group/t/countdown-timer/2471/3
+
+    this.speedup = this.time.delayedCall(30000, () => {
+      this.ship01.moveSpeed += 2;
+      this.ship02.moveSpeed += 2;
+      this.ship03.moveSpeed += 2;
+      this.sship.moveSpeed += 1;
+      console.log("30 seconds has passed. Ship speedup.") 
+    })
 
     function onEvent() {
       this.gameTimer -= 1;
@@ -181,8 +193,8 @@ class Play extends Phaser.Scene {
       this.gameOver = true;
     }
 
-
     if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)) {
+      this.music.setMute(true);
       this.scene.restart();
     }
 
